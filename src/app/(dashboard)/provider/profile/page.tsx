@@ -26,7 +26,7 @@ export default function ProviderProfilePage() {
   const [newSkill, setNewSkill] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
   const [serviceArea, setServiceArea] = useState("");
-  const [certifications, setCertifications] = useState<string[]>([]);
+  const [certifications, setCertifications] = useState<any[]>([]);
   const [uploadingCert, setUploadingCert] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -52,12 +52,7 @@ export default function ProviderProfilePage() {
           setCategories(["Electrician"]);
         }
 
-        try {
-          setCertifications(JSON.parse(data.profile.certifications || "[]"));
-        } catch {
-          setCertifications([]);
-        }
-
+        setCertifications(data.profile.certifications || []);
         setServiceArea(data.profile.serviceArea || "");
       }
     } catch (err) {
@@ -104,8 +99,16 @@ export default function ProviderProfilePage() {
       const res = await fetch("/api/uploads", { method: "POST", body: formData });
       const data = await res.json();
       if (data.success) {
-        const certName = `${file.name} (Uploaded ${new Date().toLocaleDateString()})`;
-        setCertifications([...certifications, certName]);
+        // Create the DB record
+        const certRes = await fetch("/api/providers/certifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: data.originalName, fileUrl: data.url })
+        });
+        const certData = await certRes.json();
+        if (certData.success) {
+          setCertifications([...certifications, certData.certification]);
+        }
       } else {
         alert("Upload error: " + data.error);
       }
@@ -114,6 +117,11 @@ export default function ProviderProfilePage() {
     } finally {
       setUploadingCert(false);
     }
+  };
+
+  const handleRemoveCert = async (certId: string) => {
+    // Mock delete for now, in real life we would DELETE /api/providers/certifications
+    setCertifications(certifications.filter((c) => c.id !== certId));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -319,18 +327,25 @@ export default function ProviderProfilePage() {
                 No formal certificates uploaded yet. Click above to attach trade licenses or safety credentials.
               </p>
             ) : (
-              certifications.map((cert, idx) => (
+              certifications.map((cert) => (
                 <div
-                  key={idx}
+                  key={cert.id}
                   className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs"
                 >
                   <div className="flex items-center gap-2 text-slate-800 font-medium">
                     <FileText className="w-4 h-4 text-blue-600" />
-                    <span>{cert}</span>
+                    <span>{cert.name}</span>
+                    {cert.status === "VERIFIED" ? (
+                      <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px]">Verified</span>
+                    ) : cert.status === "REJECTED" ? (
+                      <span className="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px]">Rejected</span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px]">Pending</span>
+                    )}
                   </div>
                   <button
                     type="button"
-                    onClick={() => setCertifications(certifications.filter((_, i) => i !== idx))}
+                    onClick={() => handleRemoveCert(cert.id)}
                     className="text-slate-400 hover:text-rose-600 text-xs font-semibold"
                   >
                     Remove

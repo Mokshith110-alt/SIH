@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Users, LogOut, MapPin, Wrench } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
 import DemoAccountSwitcher from "./DemoAccountSwitcher";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 interface NavbarProps {
   user: {
@@ -73,7 +74,7 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
             <div>
               <span className="font-bold text-base text-slate-900 leading-tight block">
-                Coop Gig Services
+                CoopServe
               </span>
               <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">
                 Community Cooperative
@@ -92,6 +93,8 @@ export default function Navbar({ user }: NavbarProps) {
 
         {/* Right Nav Actions */}
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+
           {/* Quick Demo Switcher */}
           <DemoAccountSwitcher />
 

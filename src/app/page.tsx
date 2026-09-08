@@ -16,9 +16,12 @@ import {
   HeartHandshake,
 } from "lucide-react";
 import { DEMO_ACCOUNTS } from "@/components/DemoAccountSwitcher";
+import { useTranslation } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function HomePage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleQuickDemo = async (email: string) => {
     try {
@@ -56,11 +59,12 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <Link
               href="/login"
               className="px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
             >
-              Sign In
+              {t("btn.login")}
             </Link>
             <Link
               href="/register"
@@ -81,7 +85,7 @@ export default function HomePage() {
               Community-Owned Cooperative Dispatch System
             </div>
             <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-              Fair, Reliable Household & Community Services
+              {t("hero.title")}
             </h1>
             <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
               Connect members with certified, verified local service professionals. Manage personal

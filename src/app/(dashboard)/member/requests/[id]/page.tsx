@@ -23,6 +23,7 @@ import StatusBadge from "@/components/StatusBadge";
 import UrgencyBadge from "@/components/UrgencyBadge";
 import StatusTimeline from "@/components/StatusTimeline";
 import ReviewModal from "@/components/ReviewModal";
+import ReportModal from "@/components/ReportModal";
 
 export default function MemberRequestDetailPage({
   params,
@@ -37,6 +38,7 @@ export default function MemberRequestDetailPage({
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Community discussion states
   const [newComment, setNewComment] = useState("");
@@ -181,27 +183,47 @@ export default function MemberRequestDetailPage({
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+          >
+            <AlertTriangle className="w-3.5 h-3.5" /> Report Issue
+          </button>
           {isPending && (
             <button
               onClick={handleCancel}
               disabled={cancelling}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all disabled:opacity-50"
+              className="px-3 py-1.5 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors disabled:opacity-50"
             >
-              <XCircle className="w-4 h-4" />
-              <span>{cancelling ? "Cancelling..." : "Cancel Request"}</span>
+              {cancelling ? "Cancelling..." : "Cancel Request"}
             </button>
           )}
-
-          {isResolved && !request.rating && request.assignedProvider && (
+          {isResolved && !request.rating && (
             <button
               onClick={() => setIsReviewModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-amber-900 bg-amber-400 hover:bg-amber-500 shadow-sm transition-all"
+              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
             >
-              <Star className="w-4 h-4 fill-amber-900" />
-              <span>Rate & Review Service</span>
+              <Star className="w-3.5 h-3.5 fill-current" /> Write Review
             </button>
           )}
+          {isResolved && request.payment?.status !== "SUCCESS" && (
+            <Link
+              href={`/member/requests/${request.id}/pay`}
+              className="px-4 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+            >
+              Pay Now
+            </Link>
+          )}
+          {request.payment?.status === "SUCCESS" && (
+            <span className="px-3 py-1.5 text-xs font-medium text-green-700 bg-green-100 rounded-lg flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5" /> Paid (₹{request.payment.amount})
+            </span>
+          )}
         </div>
+
+        {isReportModalOpen && (
+          <ReportModal requestId={request.id} onClose={() => setIsReportModalOpen(false)} />
+        )}
       </div>
 
       {/* Emergency Alert Banner */}

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { ROLES } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +14,11 @@ export async function GET() {
     const providerUser = await prisma.user.findUnique({
       where: { id: user.userId },
       include: {
-        providerProfile: true,
+        providerProfile: {
+          include: {
+            certifications: true
+          }
+        },
         ratingsReceived: {
           include: {
             member: { select: { name: true, locality: true } },
@@ -49,7 +52,7 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json();
-    const { skills, serviceCategories, serviceArea, certifications } = body;
+    const { skills, serviceCategories, serviceArea } = body;
 
     const updatedProfile = await prisma.providerProfile.update({
       where: { userId: user.userId },
@@ -57,7 +60,6 @@ export async function PUT(req: Request) {
         skills: JSON.stringify(skills || []),
         serviceCategories: JSON.stringify(serviceCategories || []),
         serviceArea: serviceArea || "",
-        ...(certifications ? { certifications: JSON.stringify(certifications) } : {}),
       },
     });
 

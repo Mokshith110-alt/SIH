@@ -26,6 +26,9 @@ export default function NewRequestPage() {
   const [locality, setLocality] = useState<string>(LOCALITIES[0]);
   const [isEmergency, setIsEmergency] = useState(false);
   const [preferredDateTime, setPreferredDateTime] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState("WEEKLY");
+  const [recurringEndDate, setRecurringEndDate] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -53,6 +56,9 @@ export default function NewRequestPage() {
           locality,
           isEmergency,
           preferredDateTime: preferredDateTime || null,
+          isRecurring,
+          recurringFrequency: isRecurring ? recurringFrequency : null,
+          recurringEndDate: isRecurring && recurringEndDate ? recurringEndDate : null,
         }),
       });
 
@@ -262,7 +268,10 @@ export default function NewRequestPage() {
                 className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
+          </div>
 
+          {/* Preferred Time & Recurring */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Preferred Date & Time
@@ -273,6 +282,41 @@ export default function NewRequestPage() {
                 onChange={(e) => setPreferredDateTime(e.target.value)}
                 className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+                <span>Recurring Service</span>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={isRecurring} 
+                    onChange={(e) => setIsRecurring(e.target.checked)}
+                    className="rounded text-blue-600 focus:ring-blue-500" 
+                  />
+                  <span className="text-xs font-medium text-slate-600 normal-case">Enable</span>
+                </label>
+              </label>
+              {isRecurring && (
+                <div className="flex gap-2">
+                  <select
+                    value={recurringFrequency}
+                    onChange={(e) => setRecurringFrequency(e.target.value)}
+                    className="w-1/2 p-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                  >
+                    <option value="DAILY">Daily</option>
+                    <option value="WEEKLY">Weekly</option>
+                    <option value="MONTHLY">Monthly</option>
+                  </select>
+                  <input
+                    type="date"
+                    title="End Date"
+                    value={recurringEndDate}
+                    onChange={(e) => setRecurringEndDate(e.target.value)}
+                    className="w-1/2 p-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
