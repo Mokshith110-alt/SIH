@@ -28,6 +28,10 @@ model User {
   notifications    Notification[]
   coSigns          CommunitySupport[]
   comments         RequestComment[]
+  
+  supportTickets   SupportTicket[]
+  feedbacks        Feedback[]
+  reports          Report[]
 }
 
 model ProviderProfile {
@@ -36,7 +40,6 @@ model ProviderProfile {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   skills            String   // JSON string array e.g. ["Electrical Wiring", "Circuit Breakers", "Inverters"]
   serviceCategories String   // JSON string array e.g. ["Electrician", "Appliance Repair"]
-  certifications    String   // JSON string array of certificate names/links
   serviceArea       String   // Locality or radius served
   isVerified        Boolean  @default(false)
   isActive          Boolean  @default(true)
@@ -44,6 +47,35 @@ model ProviderProfile {
   totalReviews      Int      @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  
+  certifications    Certification[]
+}
+
+model Certification {
+  id                String   @id @default(cuid())
+  providerProfileId String
+  providerProfile   ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  name              String
+  category          String
+  status            String   // "VERIFIED", "PENDING_VERIFICATION", "NOT_VERIFIED", "EXPIRED"
+  documentUrl       String?
+  issuedAt          DateTime?
+  expiresAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model RecurringSchedule {
+  id          String   @id @default(cuid())
+  frequency   String   // "WEEKLY", "MONTHLY", "CUSTOM"
+  startDate   DateTime
+  endDate     DateTime?
+  occurrences Int?
+  status      String   @default("ACTIVE") // "ACTIVE", "PAUSED", "CANCELLED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  requests    ServiceRequest[]
 }
 
 model ServiceRequest {
@@ -63,6 +95,16 @@ model ServiceRequest {
   completionNotes    String?
   completionPhotos   String?            // JSON string array of photo paths
   resolvedAt         DateTime?
+  
+  // Pricing
+  basePrice          Float?
+  transportCharge    Float?
+  tax                Float?
+  totalAmount        Float?
+
+  recurringScheduleId String?
+  recurringSchedule   RecurringSchedule? @relation(fields: [recurringScheduleId], references: [id])
+
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -70,6 +112,56 @@ model ServiceRequest {
   rating             Rating?
   coSigns            CommunitySupport[]
   comments           RequestComment[]
+  payment            Payment?
+  reports            Report[]
+}
+
+model Payment {
+  id             String         @id @default(cuid())
+  requestId      String         @unique
+  request        ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  amount         Float
+  currency       String         @default("INR")
+  status         String         @default("PENDING") // "PENDING", "SUCCESS", "FAILED", "CANCELLED"
+  gatewayRef     String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model SupportTicket {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     String
+  category    String
+  description String
+  priority    String   @default("NORMAL") // "LOW", "NORMAL", "HIGH"
+  status      String   @default("OPEN") // "OPEN", "IN_PROGRESS", "RESOLVED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Feedback {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int
+  category    String?
+  comments    String
+  createdAt   DateTime @default(now())
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId   String?
+  request     ServiceRequest? @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  type        String
+  description String
+  status      String   @default("SUBMITTED") // "SUBMITTED", "UNDER_REVIEW", "RESOLVED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model StatusHistory {

@@ -193,12 +193,19 @@ async function main() {
         userId: user.id,
         skills: JSON.stringify(p.skills),
         serviceCategories: JSON.stringify(p.categories),
-        certifications: JSON.stringify(p.certifications),
         serviceArea: p.serviceArea,
         isVerified: p.isVerified,
         isActive: p.isActive,
         avgRating: p.avgRating,
         totalReviews: p.totalReviews,
+        certifications: {
+          create: p.certifications.map((cert: string) => ({
+            name: cert,
+            category: p.categories[0] || "General",
+            status: "VERIFIED",
+            issuedAt: new Date(),
+          })),
+        },
       },
     });
 
