@@ -17,19 +17,19 @@ export default function LanguageSwitcher() {
         <div className="p-1 flex flex-col">
           <button 
             onClick={() => setLang("en")}
-            className={\px-3 py-2 text-xs text-left rounded-lg transition \\}
+            className={`px-3 py-2 text-xs text-left rounded-lg transition ${lang === "en" ? "bg-blue-50 text-blue-700 font-bold" : "text-slate-700 hover:bg-slate-50"}`}
           >
             English (EN)
           </button>
           <button 
             onClick={() => setLang("hi")}
-            className={\px-3 py-2 text-xs text-left rounded-lg transition \\}
+            className={`px-3 py-2 text-xs text-left rounded-lg transition ${lang === "hi" ? "bg-blue-50 text-blue-700 font-bold" : "text-slate-700 hover:bg-slate-50"}`}
           >
             हिन्दी (HI)
           </button>
           <button 
             onClick={() => setLang("te")}
-            className={\px-3 py-2 text-xs text-left rounded-lg transition \\}
+            className={`px-3 py-2 text-xs text-left rounded-lg transition ${lang === "te" ? "bg-blue-50 text-blue-700 font-bold" : "text-slate-700 hover:bg-slate-50"}`}
           >
             తెలుగు (TE)
           </button>
