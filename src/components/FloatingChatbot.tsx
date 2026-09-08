@@ -124,13 +124,13 @@ export default function FloatingChatbot() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={ixed bottom-6 right-6 p-4 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all z-50 }
+        className="fixed bottom-6 right-6 p-4 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all z-50"
       >
         <MessageSquare size={24} />
       </button>
 
       <div
-        className={ixed bottom-6 right-6 w-96 max-w-[calc(100vw-3rem)] h-[500px] max-h-[calc(100vh-3rem)] bg-white rounded-2xl shadow-2xl flex flex-col transition-all z-50 overflow-hidden border border-gray-100  origin-bottom-right}
+        className={`fixed bottom-6 right-6 w-96 max-w-[calc(100vw-3rem)] h-[500px] max-h-[calc(100vh-3rem)] bg-white rounded-2xl shadow-2xl flex flex-col transition-all z-50 overflow-hidden border border-gray-100 origin-bottom-right ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}`}
       >
         <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
           <div>
@@ -149,9 +149,9 @@ export default function FloatingChatbot() {
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
           {messages.map((msg, i) => (
-            <div key={i} className={lex }>
+            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={max-w-[80%] rounded-2xl p-3 text-sm prose prose-sm }
+                className={`max-w-[80%] rounded-2xl p-3 text-sm prose prose-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'}`}
               >
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
@@ -171,7 +171,7 @@ export default function FloatingChatbot() {
           <button
             type="button"
             onClick={toggleListening}
-            className={p-2 rounded-full transition-colors }
+            className={`p-2 rounded-full transition-colors ${isListening ? 'bg-red-100 text-red-600' : 'text-gray-400 hover:bg-gray-100'}`}
             title="Use Voice"
           >
             {isListening ? <MicOff size={20} /> : <Mic size={20} />}
