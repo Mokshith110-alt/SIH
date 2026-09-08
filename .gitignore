@@ -13,3 +13,4 @@ out/
 # vercel
 .vercel
 dev.db
+.vercel
